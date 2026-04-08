@@ -24,8 +24,9 @@ type MonthTheme = {
   image: string;
   specialty: string;
   climate: string;
-  indicator: string;
 };
+
+type NavDirection = "left" | "right";
 
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -37,18 +38,18 @@ const IMAGES = [
 ];
 
 const MONTHS: MonthTheme[] = [
-  { name: "JANUARY", accent: "#c9a46a", accentSoft: "#f2e6d3", panel: "#22283a", image: IMAGES[3], specialty: "Quiet reset", climate: "Cool light and crisp starts", indicator: "Low haze" },
-  { name: "FEBRUARY", accent: "#c98a7c", accentSoft: "#f3dfda", panel: "#2c2432", image: IMAGES[0], specialty: "Soft bloom", climate: "Gentle warmth and longer afternoons", indicator: "First bloom" },
-  { name: "MARCH", accent: "#8ea26b", accentSoft: "#e5eddc", panel: "#213027", image: IMAGES[1], specialty: "Spring edge", climate: "Fresh air and greener tones", indicator: "Fresh air" },
-  { name: "APRIL", accent: "#d7a36d", accentSoft: "#f5e5d6", panel: "#23293a", image: IMAGES[1], specialty: "Clear skies", climate: "Sunny days with balanced warmth", indicator: "Clear sun" },
-  { name: "MAY", accent: "#d89c59", accentSoft: "#f7e3ce", panel: "#2b2227", image: IMAGES[2], specialty: "Dry gold", climate: "Heat building across the month", indicator: "Warm rise" },
-  { name: "JUNE", accent: "#7d90c7", accentSoft: "#dfe5f6", panel: "#21283a", image: IMAGES[3], specialty: "Monsoon edge", climate: "Clouds gather with cooler blues", indicator: "Cloud front" },
-  { name: "JULY", accent: "#6d86c9", accentSoft: "#dbe3f8", panel: "#1f2637", image: IMAGES[3], specialty: "Rain wash", climate: "Dense greens and diffused daylight", indicator: "Rainfall" },
-  { name: "AUGUST", accent: "#5f9f98", accentSoft: "#dcedea", panel: "#1f2c2e", image: IMAGES[0], specialty: "Humid calm", climate: "Heavy air with lush texture", indicator: "Dense air" },
-  { name: "SEPTEMBER", accent: "#b89b62", accentSoft: "#efe5d5", panel: "#28262d", image: IMAGES[2], specialty: "Golden shift", climate: "Balanced heat and drier evenings", indicator: "Dry light" },
-  { name: "OCTOBER", accent: "#b97b58", accentSoft: "#f1ddd3", panel: "#2d2421", image: IMAGES[2], specialty: "Amber fall", climate: "Warm color with gentler sun", indicator: "Amber tone" },
-  { name: "NOVEMBER", accent: "#8a78b4", accentSoft: "#e5dff1", panel: "#262431", image: IMAGES[0], specialty: "Cool hush", climate: "Muted skies and calm mornings", indicator: "Still air" },
-  { name: "DECEMBER", accent: "#738cb1", accentSoft: "#dfe7f0", panel: "#212735", image: IMAGES[3], specialty: "Winter blue", climate: "Short days and clean blue light", indicator: "Blue hour" },
+  { name: "JANUARY", accent: "#c9a46a", accentSoft: "#f2e6d3", panel: "#22283a", image: IMAGES[3], specialty: "Quiet reset", climate: "Cool light and crisp starts" },
+  { name: "FEBRUARY", accent: "#c98a7c", accentSoft: "#f3dfda", panel: "#2c2432", image: IMAGES[0], specialty: "Soft bloom", climate: "Gentle warmth and longer afternoons" },
+  { name: "MARCH", accent: "#8ea26b", accentSoft: "#e5eddc", panel: "#213027", image: IMAGES[1], specialty: "Spring edge", climate: "Fresh air and greener tones" },
+  { name: "APRIL", accent: "#d7a36d", accentSoft: "#f5e5d6", panel: "#23293a", image: IMAGES[1], specialty: "Clear skies", climate: "Sunny days with balanced warmth" },
+  { name: "MAY", accent: "#d89c59", accentSoft: "#f7e3ce", panel: "#2b2227", image: IMAGES[2], specialty: "Dry gold", climate: "Heat building across the month" },
+  { name: "JUNE", accent: "#7d90c7", accentSoft: "#dfe5f6", panel: "#21283a", image: IMAGES[3], specialty: "Monsoon edge", climate: "Clouds gather with cooler blues" },
+  { name: "JULY", accent: "#6d86c9", accentSoft: "#dbe3f8", panel: "#1f2637", image: IMAGES[3], specialty: "Rain wash", climate: "Dense greens and diffused daylight" },
+  { name: "AUGUST", accent: "#5f9f98", accentSoft: "#dcedea", panel: "#1f2c2e", image: IMAGES[0], specialty: "Humid calm", climate: "Heavy air with lush texture" },
+  { name: "SEPTEMBER", accent: "#b89b62", accentSoft: "#efe5d5", panel: "#28262d", image: IMAGES[2], specialty: "Golden shift", climate: "Balanced heat and drier evenings" },
+  { name: "OCTOBER", accent: "#b97b58", accentSoft: "#f1ddd3", panel: "#2d2421", image: IMAGES[2], specialty: "Amber fall", climate: "Warm color with gentler sun" },
+  { name: "NOVEMBER", accent: "#8a78b4", accentSoft: "#e5dff1", panel: "#262431", image: IMAGES[0], specialty: "Cool hush", climate: "Muted skies and calm mornings" },
+  { name: "DECEMBER", accent: "#738cb1", accentSoft: "#dfe7f0", panel: "#212735", image: IMAGES[3], specialty: "Winter blue", climate: "Short days and clean blue light" },
 ];
 
 function startOfMonth(date: Date) {
@@ -105,10 +106,10 @@ function formatRange(range: DateRange) {
 
 export function WallCalendar() {
   const [viewDate, setViewDate] = useState(() => startOfMonth(new Date()));
+  const [incomingDate, setIncomingDate] = useState<Date | null>(null);
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
-
-  const theme = MONTHS[viewDate.getMonth()];
-  const days = useMemo(() => buildMonthGrid(viewDate), [viewDate]);
+  const [navDirection, setNavDirection] = useState<NavDirection>("right");
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const rangeBounds = useMemo(() => {
     if (!range.start) {
@@ -121,28 +122,115 @@ export function WallCalendar() {
   }, [range]);
 
   function selectDay(iso: string) {
+    if (isAnimating) return;
     if (!range.start || range.end) {
       setRange({ start: iso, end: null });
       return;
     }
-
     if (iso < range.start) {
       setRange({ start: iso, end: range.start });
       return;
     }
-
     setRange({ start: range.start, end: iso });
   }
 
+  function changeMonth(direction: NavDirection) {
+    if (isAnimating) return;
+    setNavDirection(direction);
+    setIncomingDate(addMonths(viewDate, direction === "right" ? 1 : -1));
+    setIsAnimating(true);
+  }
+
+  function finishFlip() {
+    if (!incomingDate) return;
+    setViewDate(incomingDate);
+    setIncomingDate(null);
+    setIsAnimating(false);
+  }
+
+  function renderSheet(sheetDate: Date, layerClassName: string, cardClassName?: string, onAnimationEnd?: () => void) {
+    const theme = MONTHS[sheetDate.getMonth()];
+    const days = buildMonthGrid(sheetDate);
+
+    return (
+      <div
+        className={layerClassName}
+        style={{
+          "--accent": theme.accent,
+          "--accent-soft": theme.accentSoft,
+          "--panel": theme.panel,
+        } as CSSProperties}
+        onAnimationEnd={onAnimationEnd}
+      >
+        <div className={[styles.card, cardClassName ?? ""].join(" ")}>
+          <div className={styles.imagePanel}>
+            <Image src={theme.image} alt={`${theme.name} placeholder artwork`} fill priority className={styles.heroImage} />
+            <div className={styles.imageOverlay} />
+            <div className={styles.overlayYear}>{sheetDate.getFullYear()}</div>
+            <div className={styles.overlayMonth}>
+              <span>{`${sheetDate.getMonth() + 1}`.padStart(2, "0")}</span>
+              <strong>{theme.name}</strong>
+            </div>
+          </div>
+
+          <div className={styles.calendarPanel}>
+            <div className={styles.cutTriangle} aria-hidden="true" />
+            <div className={styles.headerRow}>
+              <div>
+                <span className={styles.kicker}>{theme.specialty}</span>
+                <h1>{theme.climate}</h1>
+              </div>
+            </div>
+
+            <div className={styles.selectionLine}>
+              <span className={styles.selectionLabel}>Selected</span>
+              <strong>{formatRange(range)}</strong>
+            </div>
+
+            <div className={styles.weekdays}>
+              {WEEKDAYS.map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+            </div>
+
+            <div className={styles.grid}>
+              {days.map((day) => {
+                const inRange = rangeBounds ? day.date >= rangeBounds.start && day.date <= rangeBounds.end : false;
+                const isStart = range.start === day.iso;
+                const isEnd = range.end === day.iso;
+
+                return (
+                  <button
+                    key={day.iso}
+                    type="button"
+                    onClick={() => selectDay(day.iso)}
+                    className={[
+                      styles.dayCell,
+                      !day.inMonth ? styles.outsideMonth : "",
+                      inRange ? styles.inRange : "",
+                      isStart ? styles.rangeEdge : "",
+                      isEnd ? styles.rangeEdge : "",
+                    ].join(" ")}
+                  >
+                    {`${day.dayNumber}`.padStart(2, "0")}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const outgoingCardClass = isAnimating
+    ? navDirection === "right"
+      ? styles.cardFlipNext
+      : styles.cardFlipPrevious
+    : "";
+
   return (
-    <main
-      className={styles.page}
-      style={{
-        "--accent": theme.accent,
-        "--accent-soft": theme.accentSoft,
-        "--panel": theme.panel,
-      } as CSSProperties}
-    >
+    <main className={styles.page}>
       <section className={styles.scene}>
         <div className={styles.stand} aria-hidden="true" />
         <div className={styles.calendar}>
@@ -152,82 +240,34 @@ export function WallCalendar() {
             ))}
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.imagePanel}>
-              <Image
-                src={theme.image}
-                alt={`${theme.name} placeholder artwork`}
-                fill
-                priority
-                className={styles.heroImage}
-              />
-              <div className={styles.imageOverlay} />
-              <div className={styles.overlayAccent} aria-hidden="true" />
-              <div className={styles.overlayYear}>{viewDate.getFullYear()}</div>
-              <div className={styles.overlayMonth}>
-                <span>{`${viewDate.getMonth() + 1}`.padStart(2, "0")}</span>
-                <strong>{theme.name}</strong>
-              </div>
-            </div>
+          <div className={styles.controls}>
+            <button type="button" className={`${styles.navButton} ${styles.navLeft}`} onClick={() => changeMonth("left")} aria-label="Previous month">
+              {"<"}
+            </button>
+            <button type="button" className={`${styles.navButton} ${styles.navRight}`} onClick={() => changeMonth("right")} aria-label="Next month">
+              {">"}
+            </button>
+          </div>
 
-            <div className={styles.calendarPanel}>
-              <div className={styles.cutTriangle} aria-hidden="true" />
-              <div className={styles.headerRow}>
-                <div>
-                  <span className={styles.kicker}>{theme.specialty}</span>
-                  <h1>{theme.climate}</h1>
-                </div>
-                <div className={styles.controls}>
-                  <button type="button" className={`${styles.navButton} ${styles.navLeft}`} onClick={() => setViewDate((current) => addMonths(current, -1))} aria-label="Previous month">
-                    {"<"}
-                  </button>
-                  <button type="button" className={`${styles.navButton} ${styles.navRight}`} onClick={() => setViewDate((current) => addMonths(current, 1))} aria-label="Next month">
-                    {">"}
-                  </button>
-                </div>
-              </div>
+          <div className={styles.sheetStage}>
+            {incomingDate
+              ? renderSheet(
+                  incomingDate,
+                  `${styles.sheetLayer} ${styles.sheetIncoming} ${navDirection === "right" ? styles.revealForward : styles.revealBackward}`
+                )
+              : null}
 
-              <div className={styles.selectionLine}>
-                <span className={styles.selectionLabel}>Selected</span>
-                <strong>{formatRange(range)}</strong>
-              </div>
-
-              <div className={styles.weekdays}>
-                {WEEKDAYS.map((day) => (
-                  <span key={day}>{day}</span>
-                ))}
-              </div>
-
-              <div className={styles.grid}>
-                {days.map((day) => {
-                  const inRange = rangeBounds
-                    ? day.date >= rangeBounds.start && day.date <= rangeBounds.end
-                    : false;
-                  const isStart = range.start === day.iso;
-                  const isEnd = range.end === day.iso;
-
-                  return (
-                    <button
-                      key={day.iso}
-                      type="button"
-                      onClick={() => selectDay(day.iso)}
-                      className={[
-                        styles.dayCell,
-                        !day.inMonth ? styles.outsideMonth : "",
-                        inRange ? styles.inRange : "",
-                        isStart ? styles.rangeEdge : "",
-                        isEnd ? styles.rangeEdge : "",
-                      ].join(" ")}
-                    >
-                      {`${day.dayNumber}`.padStart(2, "0")}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            {renderSheet(
+              viewDate,
+              `${styles.sheetLayer} ${isAnimating ? styles.sheetOutgoing : styles.sheetCurrent}`,
+              outgoingCardClass,
+              isAnimating ? finishFlip : undefined
+            )}
           </div>
         </div>
       </section>
     </main>
   );
 }
+
+

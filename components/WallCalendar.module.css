@@ -30,6 +30,8 @@
 .calendar {
   position: relative;
   z-index: 2;
+  perspective: 2200px;
+  perspective-origin: center top;
 }
 
 .binding {
@@ -37,6 +39,8 @@
   justify-content: center;
   gap: 18px;
   margin-bottom: -10px;
+  position: relative;
+  z-index: 5;
 }
 
 .ring {
@@ -47,10 +51,93 @@
   background: transparent;
 }
 
+.controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: #22283a;
+  color: white;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateY(-50%);
+  transition: transform 160ms ease, filter 160ms ease;
+  box-shadow: 0 12px 24px rgba(21, 24, 29, 0.16);
+}
+
+.navButton:hover {
+  filter: brightness(1.05);
+}
+
+.navLeft {
+  left: -40px;
+}
+
+.navRight {
+  right: -40px;
+}
+
+.sheetStage {
+  position: relative;
+  transform-style: preserve-3d;
+  isolation: isolate;
+}
+
+.sheetLayer {
+  position: relative;
+}
+
+.sheetCurrent {
+  z-index: 3;
+}
+
+.sheetOutgoing {
+  z-index: 4;
+  pointer-events: none;
+}
+
+.sheetIncoming {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.revealForward {
+  animation: reveal-forward 620ms ease-out both;
+}
+
+.revealBackward {
+  animation: reveal-backward 620ms ease-out both;
+}
+
 .card {
-  overflow: visible;
+  position: relative;
+  overflow: hidden;
   background: #faf9f7;
   box-shadow: 0 24px 44px rgba(33, 41, 56, 0.16);
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.cardFlipNext {
+  transform-origin: top center;
+  animation: flip-next-card 700ms ease-in both;
+}
+
+.cardFlipPrevious {
+  transform-origin: bottom center;
+  animation: flip-previous-card 700ms ease-in both;
 }
 
 .imagePanel {
@@ -122,7 +209,7 @@
 
 .headerRow {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
@@ -147,40 +234,6 @@
   font-size: 1.14rem;
   line-height: 1.15;
   color: #272d38;
-}
-
-.controls {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.navButton {
-  position: absolute;
-  top: 50%;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--panel);
-  color: white;
-  cursor: pointer;
-  pointer-events: auto;
-  transform: translateY(-50%);
-  transition: transform 160ms ease, filter 160ms ease;
-  box-shadow: 0 12px 24px rgba(21, 24, 29, 0.16);
-}
-
-.navButton:hover {
-  filter: brightness(1.05);
-}
-
-.navLeft {
-  left: -40px;
-}
-
-.navRight {
-  right: -40px;
 }
 
 .selectionLine {
@@ -245,6 +298,50 @@
 .rangeEdge {
   background: var(--accent);
   color: white;
+}
+
+@keyframes flip-next-card {
+  from {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flip-previous-card {
+  from {
+    transform: rotateX(0deg) translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: rotateX(-90deg) translateY(-18px);
+    opacity: 0;
+  }
+}
+
+@keyframes reveal-forward {
+  from {
+    opacity: 0.88;
+    transform: translateY(14px) scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reveal-backward {
+  from {
+    opacity: 0.88;
+    transform: translateY(-18px) scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (min-width: 780px) {
@@ -323,3 +420,5 @@
     min-height: 46px;
   }
 }
+
+

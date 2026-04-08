@@ -1,0 +1,40 @@
+:root {
+  --background: #ede9e4;
+  --foreground: #18324a;
+  --paper: #fbfaf8;
+  --paper-shadow: 0 32px 70px rgba(31, 40, 52, 0.16);
+  --accent: #1e95d3;
+  --accent-soft: rgba(30, 149, 211, 0.18);
+  --accent-strong: #0d6f9b;
+  --ink-soft: #607083;
+  --line: rgba(24, 50, 74, 0.12);
+  --warm-shadow: radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 58%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    var(--warm-shadow),
+    linear-gradient(180deg, #f4f1ec 0%, #e8e1da 100%);
+  color: var(--foreground);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}

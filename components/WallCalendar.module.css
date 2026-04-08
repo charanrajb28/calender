@@ -1,0 +1,325 @@
+.page {
+  min-height: 100vh;
+  padding: 28px 18px 56px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.38), transparent 24%),
+    linear-gradient(180deg, #bfd8ee 0%, #a8cce8 100%);
+  color: #1d2330;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.scene {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  position: relative;
+  padding-top: 30px;
+}
+
+.stand {
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  width: min(94%, 860px);
+  height: 188px;
+  background: linear-gradient(180deg, #2d3042 0%, #1d2130 100%);
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  transform: translateX(-50%);
+  box-shadow: 0 34px 54px rgba(18, 24, 33, 0.3);
+}
+
+.calendar {
+  position: relative;
+  z-index: 2;
+}
+
+.binding {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: -10px;
+}
+
+.ring {
+  width: 14px;
+  height: 30px;
+  border: 4px solid rgba(21, 24, 29, 0.92);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.card {
+  overflow: visible;
+  background: #faf9f7;
+  box-shadow: 0 24px 44px rgba(33, 41, 56, 0.16);
+}
+
+.imagePanel {
+  position: relative;
+  min-height: 310px;
+  overflow: hidden;
+  background: #d8dde8;
+}
+
+.heroImage {
+  object-fit: cover;
+}
+
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(12, 16, 24, 0.08), rgba(12, 16, 24, 0.26)),
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 22%);
+}
+
+.overlayYear {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.overlayMonth {
+  position: absolute;
+  left: 18px;
+  bottom: 22px;
+  color: white;
+  display: grid;
+  gap: 4px;
+}
+
+.overlayMonth span {
+  color: var(--accent);
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+
+.overlayMonth strong {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  letter-spacing: 0.06em;
+}
+
+.calendarPanel {
+  position: relative;
+  padding: 28px 20px 30px;
+  background: #fffdf9;
+}
+
+.cutTriangle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 88px;
+  height: 34px;
+  transform: translate(-50%, -1px);
+  background: #fffdf9;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.headerRow {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kicker,
+.selectionLabel,
+.weekdays span {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.kicker,
+.selectionLabel {
+  display: block;
+  color: #8b93a0;
+  font-size: 0.66rem;
+}
+
+.headerRow h1 {
+  margin: 8px 0 0;
+  font-size: 1.14rem;
+  line-height: 1.15;
+  color: #272d38;
+}
+
+.controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.navButton {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel);
+  color: white;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateY(-50%);
+  transition: transform 160ms ease, filter 160ms ease;
+  box-shadow: 0 12px 24px rgba(21, 24, 29, 0.16);
+}
+
+.navButton:hover {
+  filter: brightness(1.05);
+}
+
+.navLeft {
+  left: -40px;
+}
+
+.navRight {
+  right: -40px;
+}
+
+.selectionLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(29, 35, 48, 0.08);
+}
+
+.selectionLine strong {
+  color: #232a35;
+  font-size: 0.94rem;
+}
+
+.weekdays,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekdays {
+  margin-bottom: 10px;
+}
+
+.weekdays span {
+  text-align: center;
+  color: #8c93a0;
+  font-size: 0.62rem;
+}
+
+.grid {
+  gap: 8px;
+}
+
+.dayCell {
+  min-height: 38px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #232a35;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.dayCell:hover {
+  background: rgba(29, 35, 48, 0.05);
+  transform: translateY(-1px);
+}
+
+.outsideMonth {
+  color: #c8ccd5;
+}
+
+.inRange {
+  background: var(--accent-soft);
+}
+
+.rangeEdge {
+  background: var(--accent);
+  color: white;
+}
+
+@media (min-width: 780px) {
+  .page {
+    padding: 38px 28px 76px;
+  }
+
+  .stand {
+    height: 228px;
+  }
+
+  .binding {
+    gap: 24px;
+  }
+
+  .imagePanel {
+    min-height: 420px;
+  }
+
+  .overlayYear {
+    top: 24px;
+    left: 24px;
+  }
+
+  .overlayMonth {
+    left: 24px;
+    bottom: 28px;
+  }
+
+  .calendarPanel {
+    padding: 34px 28px 34px;
+  }
+
+  .cutTriangle {
+    width: 116px;
+    height: 42px;
+  }
+
+  .navButton {
+    width: 50px;
+    height: 50px;
+  }
+
+  .navLeft {
+    left: -48px;
+  }
+
+  .navRight {
+    right: -48px;
+  }
+
+  .dayCell {
+    min-height: 42px;
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .imagePanel {
+    min-height: 470px;
+  }
+
+  .calendarPanel {
+    padding: 38px 32px 38px;
+  }
+
+  .navLeft {
+    left: -56px;
+  }
+
+  .navRight {
+    right: -56px;
+  }
+
+  .dayCell {
+    min-height: 46px;
+  }
+}

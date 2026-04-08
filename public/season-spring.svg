@@ -1,0 +1,20 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1000" fill="#D8ECF4"/>
+  <rect width="1600" height="1000" fill="url(#g1)"/>
+  <circle cx="1180" cy="220" r="180" fill="#FFF7D0" fill-opacity="0.8"/>
+  <circle cx="400" cy="760" r="240" fill="#9CC6A3" fill-opacity="0.75"/>
+  <path d="M0 780C150 700 280 660 430 640C620 616 720 690 900 662C1110 628 1250 460 1600 420V1000H0V780Z" fill="#5F8F6E"/>
+  <path d="M0 860C210 760 360 720 540 720C760 720 870 820 1060 790C1270 756 1400 620 1600 570V1000H0V860Z" fill="#3E6B56"/>
+  <g opacity="0.9">
+    <circle cx="1110" cy="330" r="18" fill="#F6C357"/>
+    <circle cx="1165" cy="388" r="14" fill="#F6C357"/>
+    <circle cx="1225" cy="352" r="16" fill="#F6C357"/>
+    <circle cx="1180" cy="288" r="12" fill="#F6C357"/>
+  </g>
+  <defs>
+    <linearGradient id="g1" x1="800" y1="0" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8ECF4"/>
+      <stop offset="1" stop-color="#B7D7E6"/>
+    </linearGradient>
+  </defs>
+</svg>

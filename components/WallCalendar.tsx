@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { FiTrash2, FiCheckCircle, FiCircle, FiChevronLeft, FiChevronRight, FiHelpCircle } from "react-icons/fi";
 import styles from "./WallCalendar.module.css";
+
+
 
 type DateRange = {
   start: string | null;
@@ -444,12 +447,13 @@ export function WallCalendar() {
 
           <div className={styles.controls}>
             <button type="button" className={`${styles.navButton} ${styles.navLeft}`} onClick={() => changeMonth("left")} aria-label="Previous month">
-              {"<"}
+              <FiChevronLeft />
             </button>
             <button type="button" className={`${styles.navButton} ${styles.navRight}`} onClick={() => changeMonth("right")} aria-label="Next month">
-              {">"}
+              <FiChevronRight />
             </button>
           </div>
+
 
           <div className={styles.sheetStage}>
             {incomingDate
@@ -549,29 +553,48 @@ export function WallCalendar() {
                   {activePlans.map((plan) => {
                     const window = getPlanWindow(plan);
                     return (
-                      <article key={plan.id} className={`${styles.planCard} ${plan.completed ? styles.planDone : ""}`} style={{ "--card-accent": plan.color } as CSSProperties}>
-                        <div className={styles.planCardTop}>
-                          <div>
-                            <span className={`${styles.priorityBadge} ${styles[`priority${plan.priority[0].toUpperCase()}${plan.priority.slice(1)}`]} `}>
-                              {plan.priority}
-                            </span>
+                      <article key={plan.id} className={`${styles.simplePlanCard} ${plan.completed ? styles.planDone : ""}`} style={{ "--card-accent": plan.color } as CSSProperties}>
+                        <div className={styles.planCardHeader}>
+                          <span className={`${styles.priorityIndicator} ${styles[`priority${plan.priority[0].toUpperCase()}${plan.priority.slice(1)}`]}`} />
+                          <div className={styles.planMainInfo}>
                             <h4>{plan.title}</h4>
+                            <span className={styles.planDates}>{`${formatShortDate(window.start)} - ${formatShortDate(window.end)}`}</span>
                           </div>
-                          <button type="button" className={styles.deleteButton} onClick={() => deletePlan(plan.id)}>
-                            Remove
-                          </button>
+                          <div className={styles.cardActions}>
+                            <button type="button" className={styles.helpIconButton} aria-label="Help details">
+                              <FiHelpCircle />
+                            </button>
+                            <button type="button" className={styles.deleteIconButton} onClick={() => deletePlan(plan.id)} aria-label="Remove plan">
+                              <FiTrash2 />
+                            </button>
+                          </div>
                         </div>
-                        <p className={styles.planWindowLabel}>{`${formatShortDate(window.start)} - ${formatShortDate(window.end)}`}</p>
-                        {plan.notes ? <p>{plan.notes}</p> : null}
-                        <div className={styles.planCardBottom}>
-                          <span>{new Date(plan.createdAt).toLocaleDateString()}</span>
-                          <button type="button" className={styles.toggleButton} onClick={() => togglePlan(plan.id)}>
-                            {plan.completed ? "Mark active" : "Mark done"}
+                        
+                        {plan.notes ? <p className={styles.planNotes}>{plan.notes}</p> : null}
+                        
+                        <div className={styles.planCardFooter}>
+                          <button 
+                            type="button" 
+                            className={styles.completeToggle} 
+                            onClick={() => togglePlan(plan.id)}
+                          >
+                            {plan.completed ? (
+                              <>
+                                <FiCheckCircle className={styles.checkIcon} />
+                                <span>Completed</span>
+                              </>
+                            ) : (
+                              <>
+                                <FiCircle className={styles.circleIcon} />
+                                <span>Mark as complete</span>
+                              </>
+                            )}
                           </button>
                         </div>
                       </article>
                     );
                   })}
+
                 </div>
               )}
             </div>
@@ -581,6 +604,9 @@ export function WallCalendar() {
     </main>
   );
 }
+
+
+
 
 
 

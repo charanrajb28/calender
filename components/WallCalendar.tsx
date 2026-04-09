@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import styles from "./WallCalendar.module.css";
 
 type DateRange = {
@@ -27,15 +27,34 @@ type MonthTheme = {
 };
 
 type NavDirection = "left" | "right";
+type ScopeType = "month" | "range";
+type PlanPriority = "low" | "medium" | "high";
 
+type PlannerScope = {
+  type: ScopeType;
+  key: string;
+  label: string;
+  description: string;
+  start: string;
+  end: string;
+};
+
+type PlanItem = {
+  id: string;
+  scopeType: ScopeType;
+  scopeKey: string;
+  title: string;
+  notes: string;
+  priority: PlanPriority;
+  color: string;
+  completed: boolean;
+  createdAt: string;
+};
+
+const STORAGE_KEY = "wall-calendar-plans";
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-
-const IMAGES = [
-  "/season-winter.svg",
-  "/season-spring.svg",
-  "/season-summer.svg",
-  "/season-autumn.svg",
-];
+const IMAGES = ["/season-winter.svg", "/season-spring.svg", "/season-summer.svg", "/season-autumn.svg"];
+const PLAN_COLORS = ["#D98C7E", "#C8A95A", "#7FA780", "#6D95C8", "#8F7CC0", "#D18CBE", "#73A8A4", "#C07A5E"];
 
 const MONTHS: MonthTheme[] = [
   { name: "JANUARY", accent: "#c9a46a", accentSoft: "#f2e6d3", panel: "#22283a", image: IMAGES[3], specialty: "Quiet reset", climate: "Cool light and crisp starts" },
@@ -54,6 +73,10 @@ const MONTHS: MonthTheme[] = [
 
 function startOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function endOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
 function addMonths(date: Date, amount: number) {
@@ -78,6 +101,18 @@ function fromIso(value: string) {
   return new Date(year, month - 1, day);
 }
 
+function monthKeyFromDate(date: Date) {
+  return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}`;
+}
+
+function formatShortDate(value: string) {
+  return fromIso(value).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function formatMonthLabel(date: Date) {
+  return date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
 function buildMonthGrid(viewDate: Date) {
   const monthStart = startOfMonth(viewDate);
   const gridStart = new Date(monthStart);
@@ -95,13 +130,98 @@ function buildMonthGrid(viewDate: Date) {
 }
 
 function formatRange(range: DateRange) {
-  if (!range.start || !range.end) {
-    return "Select two dates";
+  if (!range.start) return "Select two dates";
+  if (!range.end) return formatShortDate(range.start);
+  return `${formatShortDate(range.start)} - ${formatShortDate(range.end)}`;
+}
+
+function normalizeRangeStartEnd(viewDate: Date, range: DateRange) {
+  if (!range.start) {
+    const start = toIso(startOfMonth(viewDate));
+    const end = toIso(endOfMonth(viewDate));
+    return { start, end };
   }
 
-  const start = fromIso(range.start);
-  const end = fromIso(range.end);
-  return `${start.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - ${end.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
+  const start = range.start;
+  const fallbackEnd = toIso(endOfMonth(fromIso(range.start)));
+  const end = range.end ?? fallbackEnd;
+  return start <= end ? { start, end } : { start: end, end: start };
+}
+
+function getScope(viewDate: Date, range: DateRange): PlannerScope {
+  const monthStartIso = toIso(startOfMonth(viewDate));
+  const monthEndIso = toIso(endOfMonth(viewDate));
+
+  if (!range.start) {
+    return {
+      type: "month",
+      key: monthKeyFromDate(viewDate),
+      label: formatMonthLabel(viewDate),
+      description: "Monthly planning board",
+      start: monthStartIso,
+      end: monthEndIso,
+    };
+  }
+
+  const normalized = normalizeRangeStartEnd(viewDate, range);
+
+  return {
+    type: "range",
+    key: `${normalized.start}__${normalized.end}`,
+    label: range.end ? `${formatShortDate(normalized.start)} - ${formatShortDate(normalized.end)}` : formatShortDate(normalized.start),
+    description: range.end
+      ? `${Math.round((fromIso(normalized.end).getTime() - fromIso(normalized.start).getTime()) / 86400000) + 1}-day planning window`
+      : "Single picked date",
+    start: normalized.start,
+    end: normalized.end,
+  };
+}
+
+function hexToRgba(hex: string, alpha: number) {
+  const normalized = hex.replace("#", "");
+  const value = normalized.length === 3 ? normalized.split("").map((part) => part + part).join("") : normalized;
+  const number = Number.parseInt(value, 16);
+  const r = (number >> 16) & 255;
+  const g = (number >> 8) & 255;
+  const b = number & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function normalizePlan(saved: Omit<PlanItem, "color"> & { color?: string }, index: number): PlanItem {
+  return {
+    ...saved,
+    color: saved.color ?? PLAN_COLORS[index % PLAN_COLORS.length],
+  };
+}
+
+function getPlanWindow(plan: PlanItem) {
+  if (plan.scopeType === "month") {
+    const [year, month] = plan.scopeKey.split("-").map(Number);
+    const date = new Date(year, month - 1, 1);
+    return { start: toIso(startOfMonth(date)), end: toIso(endOfMonth(date)) };
+  }
+
+  const [start, end] = plan.scopeKey.split("__");
+  return { start, end: end ?? start };
+}
+
+function windowsOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return aStart <= bEnd && bStart <= aEnd;
+}
+
+function getApplicablePlansForDay(dayIso: string, monthKey: string, plans: PlanItem[]) {
+  return plans.filter((plan) => {
+    if (plan.scopeType === "month") return plan.scopeKey === monthKey;
+    const window = getPlanWindow(plan);
+    return windowsOverlap(dayIso, dayIso, window.start, window.end);
+  });
+}
+
+function getPlansForScope(scope: PlannerScope, plans: PlanItem[]) {
+  return plans.filter((plan) => {
+    const window = getPlanWindow(plan);
+    return windowsOverlap(scope.start, scope.end, window.start, window.end);
+  });
 }
 
 export function WallCalendar() {
@@ -110,16 +230,45 @@ export function WallCalendar() {
   const [range, setRange] = useState<DateRange>({ start: null, end: null });
   const [navDirection, setNavDirection] = useState<NavDirection>("right");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [plans, setPlans] = useState<PlanItem[]>([]);
+  const [hasLoadedPlans, setHasLoadedPlans] = useState(false);
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
+  const [priority, setPriority] = useState<PlanPriority>("medium");
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setPlans(parsed.map((item, index) => normalizePlan(item, index)));
+        }
+      }
+    } catch {
+      setPlans([]);
+    } finally {
+      setHasLoadedPlans(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedPlans) return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(plans));
+  }, [plans, hasLoadedPlans]);
 
   const rangeBounds = useMemo(() => {
-    if (!range.start) {
-      return null;
-    }
-
+    if (!range.start) return null;
+    const endValue = range.end ?? range.start;
     const start = fromIso(range.start);
-    const end = range.end ? fromIso(range.end) : start;
+    const end = fromIso(endValue);
     return start <= end ? { start, end } : { start: end, end: start };
   }, [range]);
+
+  const activeScope = useMemo(() => getScope(viewDate, range), [viewDate, range]);
+  const activePlans = useMemo(() => getPlansForScope(activeScope, plans), [plans, activeScope]);
+  const monthPlans = useMemo(() => getPlansForScope(getScope(viewDate, { start: null, end: null }), plans), [plans, viewDate]);
+  const completedCount = activePlans.filter((plan) => plan.completed).length;
 
   function selectDay(iso: string) {
     if (isAnimating) return;
@@ -148,9 +297,46 @@ export function WallCalendar() {
     setIsAnimating(false);
   }
 
+  function handleCreatePlan(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const cleanTitle = title.trim();
+    const cleanNotes = notes.trim();
+    if (!cleanTitle) return;
+
+    const nextPlan: PlanItem = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      scopeType: activeScope.type,
+      scopeKey: `${activeScope.start}__${activeScope.end}`,
+      title: cleanTitle,
+      notes: cleanNotes,
+      priority,
+      color: PLAN_COLORS[plans.length % PLAN_COLORS.length],
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    setPlans((current) => [nextPlan, ...current]);
+    setTitle("");
+    setNotes("");
+    setPriority("medium");
+  }
+
+  function togglePlan(id: string) {
+    setPlans((current) => current.map((plan) => (plan.id === id ? { ...plan, completed: !plan.completed } : plan)));
+  }
+
+  function deletePlan(id: string) {
+    setPlans((current) => current.filter((plan) => plan.id !== id));
+  }
+
+  function clearSelection() {
+    setRange({ start: null, end: null });
+  }
+
   function renderSheet(sheetDate: Date, layerClassName: string, cardClassName?: string, onAnimationEnd?: () => void) {
     const theme = MONTHS[sheetDate.getMonth()];
     const days = buildMonthGrid(sheetDate);
+    const monthKey = monthKeyFromDate(sheetDate);
 
     return (
       <div
@@ -198,21 +384,33 @@ export function WallCalendar() {
                 const inRange = rangeBounds ? day.date >= rangeBounds.start && day.date <= rangeBounds.end : false;
                 const isStart = range.start === day.iso;
                 const isEnd = range.end === day.iso;
+                const applicablePlans = day.inMonth ? getApplicablePlansForDay(day.iso, monthKey, plans) : [];
+                const leadPlan = applicablePlans[0];
+                const planStyle = leadPlan
+                  ? ({
+                      "--plan-fill": hexToRgba(leadPlan.color, 0.18),
+                      "--plan-stroke": hexToRgba(leadPlan.color, 0.45),
+                      "--plan-dot": leadPlan.color,
+                    } as CSSProperties)
+                  : undefined;
 
                 return (
                   <button
                     key={day.iso}
                     type="button"
                     onClick={() => selectDay(day.iso)}
+                    style={planStyle}
                     className={[
                       styles.dayCell,
                       !day.inMonth ? styles.outsideMonth : "",
+                      applicablePlans.length > 0 ? styles.hasPlan : "",
                       inRange ? styles.inRange : "",
                       isStart ? styles.rangeEdge : "",
                       isEnd ? styles.rangeEdge : "",
                     ].join(" ")}
                   >
-                    {`${day.dayNumber}`.padStart(2, "0")}
+                    <span>{`${day.dayNumber}`.padStart(2, "0")}</span>
+                    
                   </button>
                 );
               })}
@@ -223,14 +421,18 @@ export function WallCalendar() {
     );
   }
 
-  const outgoingCardClass = isAnimating
-    ? navDirection === "right"
-      ? styles.cardFlipNext
-      : styles.cardFlipPrevious
-    : "";
+  const theme = MONTHS[viewDate.getMonth()];
+  const outgoingCardClass = isAnimating ? (navDirection === "right" ? styles.cardFlipNext : styles.cardFlipPrevious) : "";
 
   return (
-    <main className={styles.page}>
+    <main
+      className={styles.page}
+      style={{
+        "--accent": theme.accent,
+        "--accent-soft": theme.accentSoft,
+        "--panel": theme.panel,
+      } as CSSProperties}
+    >
       <section className={styles.scene}>
         <div className={styles.stand} aria-hidden="true" />
         <div className={styles.calendar}>
@@ -266,8 +468,119 @@ export function WallCalendar() {
           </div>
         </div>
       </section>
+
+      <section className={styles.plannerSection}>
+        <div className={styles.plannerShell}>
+          <div className={styles.plannerIntro}>
+            <span className={styles.plannerEyebrow}>Planning Desk</span>
+            <h2>{activeScope.label}</h2>
+            <p>{activeScope.description}</p>
+          </div>
+
+          <div className={styles.plannerMeta}>
+            <article className={styles.metaCard}>
+              <span>Open plans</span>
+              <strong>{activePlans.length}</strong>
+            </article>
+            <article className={styles.metaCard}>
+              <span>Completed</span>
+              <strong>{completedCount}</strong>
+            </article>
+            <article className={styles.metaCard}>
+              <span>This month</span>
+              <strong>{monthPlans.length}</strong>
+            </article>
+          </div>
+
+          <div className={styles.plannerGrid}>
+            <aside className={styles.planComposer}>
+              <div className={styles.composerHeader}>
+                <div>
+                  <span className={styles.plannerEyebrow}>New Plan</span>
+                  <h3>Capture the next thing to do</h3>
+                </div>
+                <button type="button" className={styles.clearButton} onClick={clearSelection}>
+                  Reset selection
+                </button>
+              </div>
+
+              <form className={styles.planForm} onSubmit={handleCreatePlan}>
+                <label className={styles.field}>
+                  <span>Title</span>
+                  <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Outline the next task or event" />
+                </label>
+
+                <label className={styles.field}>
+                  <span>Notes</span>
+                  <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Add details, reminders, or context for this plan" rows={5} />
+                </label>
+
+                <label className={styles.field}>
+                  <span>Priority</span>
+                  <select value={priority} onChange={(event) => setPriority(event.target.value as PlanPriority)}>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+
+                <button type="submit" className={styles.submitButton}>
+                  Save plan
+                </button>
+              </form>
+            </aside>
+
+            <div className={styles.planListArea}>
+              <div className={styles.listHeader}>
+                <div>
+                  <span className={styles.plannerEyebrow}>Saved Plans</span>
+                  <h3>{activeScope.type === "month" ? "Everything scheduled in this month" : range.end ? `Plans from ${formatShortDate(activeScope.start)} to ${formatShortDate(activeScope.end)}` : `Plans from ${formatShortDate(activeScope.start)}`}</h3>
+                </div>
+                <p>{activeScope.label}</p>
+              </div>
+
+              {activePlans.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <strong>No plans in this window</strong>
+                  <p>Create the first item for this month or selected date window.</p>
+                </div>
+              ) : (
+                <div className={styles.planList}>
+                  {activePlans.map((plan) => {
+                    const window = getPlanWindow(plan);
+                    return (
+                      <article key={plan.id} className={`${styles.planCard} ${plan.completed ? styles.planDone : ""}`} style={{ "--card-accent": plan.color } as CSSProperties}>
+                        <div className={styles.planCardTop}>
+                          <div>
+                            <span className={`${styles.priorityBadge} ${styles[`priority${plan.priority[0].toUpperCase()}${plan.priority.slice(1)}`]} `}>
+                              {plan.priority}
+                            </span>
+                            <h4>{plan.title}</h4>
+                          </div>
+                          <button type="button" className={styles.deleteButton} onClick={() => deletePlan(plan.id)}>
+                            Remove
+                          </button>
+                        </div>
+                        <p className={styles.planWindowLabel}>{`${formatShortDate(window.start)} - ${formatShortDate(window.end)}`}</p>
+                        {plan.notes ? <p>{plan.notes}</p> : null}
+                        <div className={styles.planCardBottom}>
+                          <span>{new Date(plan.createdAt).toLocaleDateString()}</span>
+                          <button type="button" className={styles.toggleButton} onClick={() => togglePlan(plan.id)}>
+                            {plan.completed ? "Mark active" : "Mark done"}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
+
 
 

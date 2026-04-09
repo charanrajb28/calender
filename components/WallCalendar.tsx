@@ -225,6 +225,8 @@ export function WallCalendar() {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [priority, setPriority] = useState<PlanPriority>("medium");
+  const [navDirection, setNavDirection] = useState<NavDirection>("right");
+  const [motionKey, setMotionKey] = useState(0);
 
   useEffect(() => {
     try {
@@ -273,6 +275,8 @@ export function WallCalendar() {
   }
 
   function changeMonth(direction: NavDirection) {
+    setNavDirection(direction);
+    setMotionKey((current) => current + 1);
     setViewDate((current) => addMonths(current, direction === "right" ? 1 : -1));
   }
 
@@ -339,15 +343,8 @@ export function WallCalendar() {
             </button>
           </div>
 
-          <div className={styles.sheetStage}>
-            <div
-              className={`${styles.sheetLayer} ${styles.sheetCurrent}`}
-              style={{
-                "--accent": theme.accent,
-                "--accent-soft": theme.accentSoft,
-                "--panel": theme.panel,
-              } as CSSProperties}
-            >
+          <div key={motionKey} className={`${styles.sheetStage} ${navDirection === "right" ? styles.slideForward : styles.slideBackward}`}>
+            <div className={`${styles.sheetLayer} ${styles.sheetCurrent}`}>
               <div className={styles.card}>
                 <div className={styles.imagePanel}>
                   <Image src={theme.image} alt={`${theme.name} placeholder artwork`} fill priority className={styles.heroImage} />
@@ -450,9 +447,7 @@ export function WallCalendar() {
                   <span className={styles.plannerEyebrow}>New Plan</span>
                   <h3>Capture the next thing to do</h3>
                 </div>
-                <button type="button" className={styles.clearButton} onClick={clearSelection}>
-                  Reset selection
-                </button>
+                <button type="button" className={styles.clearButton} onClick={clearSelection}>Reset selection</button>
               </div>
 
               <form className={styles.planForm} onSubmit={handleCreatePlan}>

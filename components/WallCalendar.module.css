@@ -1,16 +1,20 @@
 .page {
   min-height: 100vh;
-  padding: 28px 18px 80px;
+  padding: 28px 18px 90px;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.38), transparent 24%),
-    linear-gradient(180deg, #bfd8ee 0%, #a8cce8 48%, #edf2f7 100%);
+    linear-gradient(180deg, #bfd8ee 0%, #a8cce8 44%, #ece6dc 100%);
   color: #1d2330;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
 }
 
-.scene {
+.scene,
+.plannerSection {
   width: min(100%, 980px);
   margin: 0 auto;
+}
+
+.scene {
   position: relative;
   padding-top: 30px;
 }
@@ -30,8 +34,6 @@
 .calendar {
   position: relative;
   z-index: 2;
-  perspective: 2200px;
-  perspective-origin: center top;
 }
 
 .binding {
@@ -48,7 +50,6 @@
   height: 30px;
   border: 4px solid rgba(21, 24, 29, 0.92);
   border-radius: 999px;
-  background: transparent;
 }
 
 .controls {
@@ -71,76 +72,27 @@
   cursor: pointer;
   pointer-events: auto;
   transform: translateY(-50%);
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-size: 1.25rem !important;
-  transition: transform 160ms ease, background 160ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
   box-shadow: 0 12px 24px rgba(21, 24, 29, 0.16);
 }
 
+.navLeft { left: -40px; }
+.navRight { right: -40px; }
 
-.navButton:hover {
-  filter: brightness(1.05);
-}
-
-.navLeft {
-  left: -40px;
-}
-
-.navRight {
-  right: -40px;
-}
-
-.sheetStage {
-  position: relative;
-  transform-style: preserve-3d;
-  isolation: isolate;
-}
-
-.sheetLayer {
-  position: relative;
-}
-
+.sheetStage,
+.sheetLayer,
 .sheetCurrent {
-  z-index: 3;
-}
-
-.sheetOutgoing {
-  z-index: 4;
-  pointer-events: none;
-}
-
-.sheetIncoming {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.revealForward {
-  animation: reveal-forward 620ms ease-out both;
-}
-
-.revealBackward {
-  animation: reveal-backward 620ms ease-out both;
+  position: relative;
 }
 
 .card {
-  position: relative;
   overflow: hidden;
   background: #faf9f7;
   box-shadow: 0 24px 44px rgba(33, 41, 56, 0.16);
-  transform-origin: top center;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
 }
-
-.cardFlipNext, .cardFlipPrevious {
-  opacity: 0;
-  transition: opacity 300ms ease-out;
-}
-
 
 .imagePanel {
   position: relative;
@@ -149,9 +101,7 @@
   background: #d8dde8;
 }
 
-.heroImage {
-  object-fit: cover;
-}
+.heroImage { object-fit: cover; }
 
 .imageOverlay {
   position: absolute;
@@ -209,30 +159,16 @@
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 
-.headerRow {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
+.headerRow { margin-bottom: 16px; }
 
 .kicker,
 .selectionLabel,
 .weekdays span,
 .plannerEyebrow,
 .field span,
-.metaCard span,
-.priorityBadge {
+.metaCard span {
   text-transform: uppercase;
   letter-spacing: 0.14em;
-}
-
-.kicker,
-.selectionLabel,
-.plannerEyebrow,
-.field span,
-.metaCard span {
   display: block;
   color: #8b93a0;
   font-size: 0.66rem;
@@ -266,19 +202,9 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
-.weekdays {
-  margin-bottom: 10px;
-}
-
-.weekdays span {
-  text-align: center;
-  color: #8c93a0;
-  font-size: 0.62rem;
-}
-
-.grid {
-  gap: 8px;
-}
+.weekdays { margin-bottom: 10px; }
+.weekdays span { text-align: center; }
+.grid { gap: 8px; }
 
 .dayCell {
   min-height: 38px;
@@ -290,7 +216,6 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  gap: 4px;
   transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
@@ -299,62 +224,37 @@
   transform: translateY(-1px);
 }
 
-.outsideMonth {
-  color: #c8ccd5;
-}
+.outsideMonth { color: #c8ccd5; }
+.hasPlan { background: var(--plan-fill); box-shadow: inset 0 0 0 1px var(--plan-stroke); }
+.inRange { background: var(--accent-soft); }
+.rangeEdge { background: var(--accent); color: white; }
 
-.hasPlan {
-  background: var(--plan-fill);
-  box-shadow: inset 0 0 0 1px var(--plan-stroke);
-}
-
-.inRange {
-  background: var(--accent-soft);
-}
-
-.rangeEdge {
-  background: var(--accent);
-  color: white;
-}
-
-.plannerSection {
-  width: min(100%, 980px);
-  margin: 64px auto 0;
-}
+.plannerSection { margin-top: 64px; }
 
 .plannerShell {
-  background: rgba(255, 253, 249, 0.86);
-  border: 1px solid rgba(29, 35, 48, 0.08);
-  box-shadow: 0 18px 36px rgba(33, 41, 56, 0.08);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(247, 242, 233, 0.98));
+  border: 1px solid rgba(84, 67, 48, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 24px 44px rgba(51, 42, 30, 0.1);
   padding: 24px 18px;
-}
-
-.plannerIntro h2,
-.composerHeader h3,
-.listHeader h3,
-.planCard h4 {
-  margin: 0;
-  color: #202733;
 }
 
 .plannerIntro {
   display: grid;
   gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(94, 78, 57, 0.1);
 }
 
-.plannerIntro h2 {
-  font-size: clamp(1.7rem, 4vw, 2.4rem);
-}
-
-.plannerIntro p,
-.listHeader p,
-.emptyState p,
-.planCard p {
+.plannerIntro h2,
+.composerHeader h3,
+.listHeader h3 {
   margin: 0;
-  color: #626d7d;
-  line-height: 1.55;
+  color: #202733;
 }
+
+.plannerIntro h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+.plannerIntro p, .listHeader p, .emptyState p, .planNotes { margin: 0; color: #626d7d; line-height: 1.55; }
 
 .plannerMeta {
   display: grid;
@@ -365,8 +265,9 @@
 
 .metaCard {
   padding: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(246, 245, 241, 0.92));
-  border: 1px solid rgba(29, 35, 48, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 241, 231, 0.92));
+  border: 1px solid rgba(94, 78, 57, 0.08);
+  border-radius: 10px;
 }
 
 .metaCard strong {
@@ -374,7 +275,6 @@
   margin-top: 8px;
   font-size: 1.25rem;
   color: var(--panel);
-  text-transform: capitalize;
 }
 
 .plannerGrid {
@@ -384,40 +284,56 @@
 
 .planComposer,
 .planListArea {
-  background: white;
-  border: 1px solid rgba(29, 35, 48, 0.08);
-  padding: 18px;
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 244, 236, 0.97));
+  border: 1px solid rgba(94, 78, 57, 0.08);
+  border-radius: 14px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.planComposer::after,
+.planListArea::after {
+  content: "";
+  position: absolute;
+  width: 74px;
+  height: 22px;
+  right: 24px;
+  top: -10px;
+  background: linear-gradient(180deg, rgba(255, 230, 160, 0.88), rgba(231, 193, 112, 0.8));
+  border-radius: 4px;
+  transform: rotate(2deg);
 }
 
 .composerHeader,
-.listHeader,
-.planCardTop,
-.planCardBottom {
+.listHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(94, 78, 57, 0.16);
 }
+
+.listHeader p { color: var(--panel); font-weight: 600; }
 
 .planForm {
   display: grid;
   gap: 16px;
-  margin-top: 18px;
 }
 
-.field {
-  display: grid;
-  gap: 8px;
-}
+.field { display: grid; gap: 8px; }
 
 .field input,
 .field textarea,
 .field select {
   width: 100%;
-  border: 1px solid rgba(29, 35, 48, 0.12);
-  background: #fbfaf7;
+  border: 1px solid rgba(94, 78, 57, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 244, 236, 0.96));
   color: #202733;
   padding: 13px 14px;
+  border-radius: 8px;
   font: inherit;
   resize: vertical;
   outline: none;
@@ -430,43 +346,30 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, white);
 }
 
-.submitButton,
-.clearButton,
-.deleteButton,
-.toggleButton {
+.submitButton {
   border: 0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--panel), color-mix(in srgb, var(--panel) 82%, #111));
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clearButton {
+  border: 0;
+  background: transparent;
+  color: #735a40;
   font: inherit;
   cursor: pointer;
 }
 
-.submitButton {
-  padding: 14px 16px;
-  background: var(--panel);
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 12px 24px rgba(21, 24, 29, 0.12);
-}
-
-.clearButton,
-.deleteButton,
-.toggleButton {
-  background: transparent;
-  color: #546071;
-}
-
-.listHeader {
-  margin-bottom: 16px;
-}
-
-.listHeader p {
-  color: var(--panel);
-  font-weight: 600;
-}
-
 .emptyState {
   padding: 28px 18px;
-  border: 1px dashed rgba(29, 35, 48, 0.16);
-  background: linear-gradient(180deg, rgba(251, 250, 247, 0.95), rgba(245, 244, 239, 0.95));
+  border: 1px dashed rgba(94, 78, 57, 0.18);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(247, 241, 231, 0.96));
 }
 
 .emptyState strong {
@@ -477,1118 +380,193 @@
 
 .planList {
   display: grid;
-  gap: 14px;
-}
-
-.planCard {
-  padding: 18px;
-  border: 1px solid rgba(29, 35, 48, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 247, 243, 0.98));
-}
-
-.planCard h4 {
-  margin-top: 8px;
-  font-size: 1.05rem;
-}
-
-.planDone {
-  opacity: 0.68;
-}
-
-.priorityBadge {
-  color: #657083;
-  font-size: 0.58rem;
-}
-
-.priorityLow {
-  color: #64816a;
-}
-
-.priorityMedium {
-  color: #9f7f39;
-}
-
-.priorityHigh {
-  color: #aa5d51;
-}
-
-.planCardBottom {
-  margin-top: 14px;
-  align-items: center;
-}
-
-.planCardBottom span {
-  color: #8b93a0;
-  font-size: 0.82rem;
-}
-
-/* Animations removed to reduce 'effects' */
-
-
-/* Simplified transitions */
-@keyframes reveal-forward {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes reveal-backward {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-
-@media (min-width: 780px) {
-  .page {
-    padding: 38px 28px 96px;
-  }
-
-  .stand {
-    height: 228px;
-  }
-
-  .binding {
-    gap: 24px;
-  }
-
-  .imagePanel {
-    min-height: 420px;
-  }
-
-  .overlayYear {
-    top: 24px;
-    left: 24px;
-  }
-
-  .overlayMonth {
-    left: 24px;
-    bottom: 28px;
-  }
-
-  .calendarPanel {
-    padding: 34px 28px 34px;
-  }
-
-  .cutTriangle {
-    width: 116px;
-    height: 42px;
-  }
-
-  .navButton {
-    width: 50px;
-    height: 50px;
-  }
-
-  .navLeft {
-    left: -48px;
-  }
-
-  .navRight {
-    right: -48px;
-  }
-
-  .dayCell {
-    min-height: 42px;
-    border-radius: 999px;
-  }
-
-  .plannerShell {
-    padding: 30px;
-  }
-
-  .plannerGrid {
-    grid-template-columns: 0.92fr 1.08fr;
-    align-items: start;
-  }
-}
-
-@media (min-width: 1080px) {
-  .imagePanel {
-    min-height: 470px;
-  }
-
-  .calendarPanel {
-    padding: 38px 32px 38px;
-  }
-
-  .navLeft {
-    left: -56px;
-  }
-
-  .navRight {
-    right: -56px;
-  }
-
-  .dayCell {
-    min-height: 46px;
-  }
-
-  .plannerShell {
-    padding: 36px;
-  }
-}
-
-.plannerShell {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(248, 247, 243, 0.94)),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 14%, white), transparent 28%);
-  border: 1px solid rgba(29, 35, 48, 0.08);
-  box-shadow: 0 22px 44px rgba(33, 41, 56, 0.1);
-}
-
-.plannerShell::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 35%, white));
-}
-
-.plannerIntro {
-  grid-template-columns: 1fr;
-  gap: 10px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(29, 35, 48, 0.08);
-}
-
-.plannerEyebrow {
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.plannerIntro h2 {
-  max-width: 12ch;
-  line-height: 0.96;
-  letter-spacing: -0.04em;
-}
-
-.plannerIntro p {
-  max-width: 44ch;
-}
-
-.plannerMeta {
-  margin: 24px 0 28px;
-}
-
-.metaCard {
-  position: relative;
-  overflow: hidden;
-  padding: 18px;
-  background: rgba(255, 255, 255, 0.84);
-}
-
-.metaCard::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 3px;
-  background: color-mix(in srgb, var(--accent) 44%, white);
-}
-
-.metaCard strong {
-  font-size: 1.45rem;
-  letter-spacing: -0.03em;
-}
-
-.planComposer,
-.planListArea {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 248, 244, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.planComposer::before,
-.planListArea::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: color-mix(in srgb, var(--accent) 40%, white);
-}
-
-.composerHeader,
-.listHeader {
-  position: relative;
-  padding-bottom: 16px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid rgba(29, 35, 48, 0.08);
-}
-
-.composerHeader h3,
-.listHeader h3 {
-  font-size: 1.12rem;
-}
-
-.field input,
-.field textarea,
-.field select {
-  border-radius: 6px;
-  background: linear-gradient(180deg, #ffffff, #faf7f1);
-}
-
-.submitButton {
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--panel), color-mix(in srgb, var(--panel) 72%, black));
-}
-
-.clearButton,
-.toggleButton,
-.deleteButton {
-  padding: 0;
-  font-size: 0.92rem;
-}
-
-.clearButton:hover,
-.toggleButton:hover,
-.deleteButton:hover {
-  color: var(--panel);
-}
-
-.planList {
   gap: 16px;
+  grid-auto-rows: max-content;
+  align-content: start;
 }
-
-.planCard {
-  position: relative;
-  overflow: hidden;
-  border-radius: 24px;
-  padding: 20px;
-}
-
-.planCard::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--card-accent, var(--accent));
-}
-
-.planCard h4 {
-  max-width: 18ch;
-  line-height: 1.15;
-}
-
-.priorityBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(29, 35, 48, 0.05);
-  font-weight: 700;
-}
-
-.priorityBadge::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: currentColor;
-}
-
-.planDone {
-  background: linear-gradient(180deg, rgba(245, 246, 242, 0.98), rgba(240, 242, 236, 0.98));
-}
-
-.planCard {
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 247, 243, 0.98)),
-    linear-gradient(90deg, color-mix(in srgb, var(--card-accent, var(--accent)) 10%, white), transparent 42%);
-}
-
-.emptyState {
-  border-radius: 24px;
-}
-
-@media (min-width: 780px) {
-  .plannerIntro {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    align-items: end;
-  }
-
-  .plannerMeta {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-
-
-.planWindowLabel {
-  margin: 10px 0 8px !important;
-  color: var(--card-accent, var(--accent));
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-
-
-.plannerSection {
-  position: relative;
-}
-
-.plannerShell {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 20px, 100% 100%, 24px 100%, 0 calc(100% - 18px));
-}
-
-.plannerShell::after {
-  content: "";
-  position: absolute;
-  right: 22px;
-  top: 22px;
-  width: 110px;
-  height: 110px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, white) 0%, transparent 72%);
-  pointer-events: none;
-  opacity: 0.9;
-}
-
-.plannerIntro {
-  position: relative;
-  padding-right: 86px;
-}
-
-.plannerIntro::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 18px;
-  width: 56px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
-}
-
-.plannerMeta {
-  gap: 14px;
-}
-
-.metaCard {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
-}
-
-.planComposer,
-.planListArea {
-  border-radius: 0;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
-}
-
-.planComposer::after,
-.planListArea::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 18px;
-  height: 18px;
-  background: color-mix(in srgb, var(--accent) 18%, white);
-  clip-path: polygon(100% 0, 0 100%, 100% 100%);
-}
-
-.composerHeader,
-.listHeader {
-  align-items: end;
-}
-
-.field input,
-.field textarea,
-.field select {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
-  padding: 14px 16px;
-}
-
-.submitButton {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
-  padding: 15px 18px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.planCard {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-  padding: 22px 22px 20px;
-  box-shadow: 0 12px 26px rgba(24, 30, 41, 0.06);
-}
-
-.planCard::after {
-  content: "";
-  position: absolute;
-  right: 18px;
-  top: 18px;
-  width: 10px;
-  height: 10px;
-  background: var(--card-accent, var(--accent));
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  opacity: 0.8;
-}
-
-.priorityBadge {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-}
-
-.emptyState {
-  border-radius: 0;
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
-}
-
-@media (max-width: 779px) {
-  .plannerIntro {
-    padding-right: 0;
-  }
-
-  .plannerIntro::after {
-    display: none;
-  }
-}
-.page {
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.38), transparent 24%),
-    linear-gradient(180deg, #bfd8ee 0%, #a8cce8 42%, #e8e1d6 100%);
-}
-
-.plannerSection {
-  position: relative;
-}
-
-.plannerShell {
-  position: relative;
-  overflow: visible;
-  clip-path: none;
-  border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(247, 242, 233, 0.98)),
-    repeating-linear-gradient(180deg, rgba(120, 101, 78, 0.035) 0 1px, transparent 1px 34px);
-  border: 1px solid rgba(84, 67, 48, 0.12);
-  box-shadow:
-    0 28px 50px rgba(51, 42, 30, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.plannerShell::before {
-  height: 10px;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.02), var(--accent), rgba(0, 0, 0, 0.02));
-  border-radius: 999px;
-  top: -5px;
-  left: 26px;
-  right: 26px;
-}
-
-.plannerShell::after {
-  width: 150px;
-  height: 150px;
-  right: 8px;
-  top: 8px;
-  opacity: 0.28;
-}
-
-.plannerIntro {
-  padding: 0 0 18px;
-  border-bottom: 1px solid rgba(94, 78, 57, 0.1);
-}
-
-.plannerIntro::after {
-  display: none;
-}
-
-.plannerEyebrow {
-  color: #8f6a3b;
-}
-
-.plannerMeta {
-  gap: 16px;
-  margin: 26px 0 30px;
-}
-
-.metaCard {
-  clip-path: none;
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 241, 231, 0.92));
-  border: 1px solid rgba(94, 78, 57, 0.08);
-  box-shadow: 0 10px 20px rgba(72, 58, 41, 0.06);
-}
-
-.metaCard::after {
-  inset: auto 16px 0 16px;
-  height: 4px;
-  border-radius: 999px;
-}
-
-.plannerGrid {
-  gap: 24px;
-}
-
-.planComposer,
-.planListArea {
-  clip-path: none;
-  border-radius: 10px;
-  padding: 22px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 244, 236, 0.97));
-  border: 1px solid rgba(94, 78, 57, 0.08);
-  box-shadow:
-    0 16px 30px rgba(54, 44, 32, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
-}
-
-.planComposer::before,
-.planListArea::before {
-  display: none;
-}
-
-.planComposer::after,
-.planListArea::after {
-  content: "";
-  position: absolute;
-  width: 74px;
-  height: 22px;
-  right: 24px;
-  top: -10px;
-  background: linear-gradient(180deg, rgba(255, 230, 160, 0.88), rgba(231, 193, 112, 0.8));
-  border: 1px solid rgba(173, 132, 54, 0.12);
-  border-radius: 4px;
-  transform: rotate(2deg);
-  box-shadow: 0 8px 16px rgba(149, 112, 42, 0.08);
-  clip-path: none;
-}
-
-.listHeader,
-.composerHeader {
-  margin-bottom: 22px;
-  padding-bottom: 14px;
-  border-bottom: 1px dashed rgba(94, 78, 57, 0.16);
-}
-
-.field input,
-.field textarea,
-.field select {
-  clip-path: none;
-  border-radius: 6px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 244, 236, 0.96));
-  border-color: rgba(94, 78, 57, 0.12);
-}
-
-.submitButton {
-  clip-path: none;
-  border-radius: 8px;
-  padding: 14px 18px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  background: linear-gradient(135deg, var(--panel), color-mix(in srgb, var(--panel) 82%, #111));
-}
-
-.clearButton,
-.toggleButton,
-.deleteButton {
-  color: #735a40;
-}
-
-.planList {
-  gap: 18px;
-}
-
-.planCard {
-  clip-path: none;
-  border-radius: 8px 8px 8px 4px;
-  padding: 22px 20px 18px;
-  background:
-    linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(246, 240, 230, 0.98));
-  border: 1px solid rgba(95, 77, 56, 0.1);
-  box-shadow: 0 14px 24px rgba(66, 53, 38, 0.08);
-}
-
-.planCard::before {
-  width: 6px;
-  border-radius: 999px;
-}
-
-.planCard::after {
-  right: 18px;
-  top: -8px;
-  width: 62px;
-  height: 18px;
-  background: linear-gradient(180deg, rgba(255, 235, 178, 0.88), rgba(230, 198, 116, 0.78));
-  border: 1px solid rgba(182, 147, 64, 0.12);
-  border-radius: 3px;
-  transform: rotate(-3deg);
-  clip-path: none;
-  opacity: 0.92;
-}
-
-.planDone {
-  background: linear-gradient(180deg, rgba(242, 244, 238, 0.98), rgba(236, 239, 231, 0.98));
-}
-
-.priorityBadge {
-  clip-path: none;
-  border-radius: 999px;
-  background: rgba(89, 71, 51, 0.06);
-}
-
-.emptyState {
-  clip-path: none;
-  border-radius: 8px;
-  border-style: dashed;
-  border-color: rgba(94, 78, 57, 0.18);
-  background: linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(247, 241, 231, 0.96));
-}
-
-.planWindowLabel {
-  color: color-mix(in srgb, var(--card-accent, var(--accent)) 70%, #6f5535);
-}
-
-
-.planList {
-  gap: 20px;
-}
-
-.planCard {
-  border-radius: 4px 4px 10px 4px;
-  padding: 24px 20px 18px;
-  background:
-    linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(247, 239, 221, 0.98));
-  border: 1px solid rgba(128, 104, 72, 0.12);
-  box-shadow:
-    0 18px 28px rgba(70, 56, 40, 0.1),
-    0 2px 0 rgba(255, 255, 255, 0.55) inset;
-  transform: rotate(-0.4deg);
-}
-
-.planCard:nth-child(2n) {
-  transform: rotate(0.55deg);
-}
-
-.planCard:nth-child(3n) {
-  transform: rotate(-0.2deg);
-}
-
-.planCard::before {
-  width: 5px;
-  background: linear-gradient(180deg, var(--card-accent, var(--accent)), color-mix(in srgb, var(--card-accent, var(--accent)) 60%, #7d6240));
-}
-
-.planCard::after {
-  right: 50%;
-  top: -10px;
-  width: 84px;
-  height: 20px;
-  transform: translateX(50%) rotate(-2deg);
-  background: linear-gradient(180deg, rgba(246, 217, 143, 0.92), rgba(223, 186, 103, 0.82));
-  border: 1px solid rgba(170, 131, 53, 0.16);
-  box-shadow: 0 6px 10px rgba(162, 125, 48, 0.1);
-}
-
-.planCardTop {
-  align-items: flex-start;
-}
-
-.planCardTop h4 {
-  margin-top: 10px;
-  font-size: 1.45rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: #2d3340;
-}
-
-.priorityBadge {
-  padding: 8px 14px;
-  background: rgba(120, 101, 71, 0.08);
-  color: #8e6a2f;
-  font-size: 0.68rem;
-}
-
-.priorityBadge::before {
-  width: 9px;
-  height: 9px;
-}
-
-.planWindowLabel {
-  margin: 14px 0 12px !important;
-  color: #647089;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.planCard p {
-  color: #5f6a7c;
-  font-size: 1.12rem;
-  line-height: 1.55;
-}
-
-.deleteButton,
-.toggleButton {
-  color: #84633d;
-  font-weight: 600;
-}
-
-.deleteButton:hover,
-.toggleButton:hover {
-  color: #5b452a;
-}
-
-.planCardBottom {
-  margin-top: 18px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(122, 100, 71, 0.16);
-}
-
-.planCardBottom span {
-  color: #7f8a9c;
-  font-size: 0.96rem;
-}
-
-.planDone {
-  filter: saturate(0.78);
-}
-
-.iconButton {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  background: rgba(120, 101, 71, 0.08);
-  color: #7a5b37;
-  font-size: 1.05rem;
-  line-height: 1;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.iconButton:hover {
-  background: rgba(120, 101, 71, 0.16);
-  color: #5b452a;
-}
-
-.planCardTop h4 {
-  font-size: 1.1rem;
-}
-
-.priorityBadge {
-  font-size: 0.6rem;
-}
-
-.planCard p {
-  font-size: 0.98rem;
-}
-
-.planCardBottom span {
-  font-size: 0.82rem;
-}
-
-.planWindowLabel {
-  display: none;
-}
-
-.iconSvg {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.planCardBottom span {
-  color: #6e7786;
-  font-size: 0.86rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-@media (min-width: 780px) {
-  .plannerGrid {
-    grid-template-columns: 0.92fr 1.08fr;
-    align-items: stretch;
-  }
-
-  .planComposer,
-  .planListArea {
-    height: 640px;
-    min-height: 640px;
-  }
-
-  .planComposer {
-    display: grid;
-    grid-template-rows: auto 1fr;
-  }
-
-  .planForm {
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 8px;
-    align-content: start;
-  }
-
-  .planListArea {
-    display: grid;
-    grid-template-rows: auto 1fr;
-  }
-
-  .planList {
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 8px;
-  }
-
-  .planForm::-webkit-scrollbar,
-  .planList::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  .planForm::-webkit-scrollbar-track,
-  .planList::-webkit-scrollbar-track {
-    background: rgba(118, 95, 64, 0.08);
-    border-radius: 999px;
-  }
-
-  .planForm::-webkit-scrollbar-thumb,
-  .planList::-webkit-scrollbar-thumb {
-    background: rgba(118, 95, 64, 0.28);
-    border-radius: 999px;
-  }
-
-  .emptyState {
-    align-self: start;
-  }
-}
-
-
-.planListArea {
-  position: relative;
-}
-
-.planListArea::before {
-  display: none;
-}
-
-.planListArea::after {
-  content: "";
-  position: absolute;
-  left: 22px;
-  right: 22px;
-  bottom: 22px;
-  height: 72px;
-  background: linear-gradient(180deg, rgba(247, 242, 233, 0), rgba(247, 242, 233, 0.92) 56%, rgba(247, 242, 233, 0.98) 100%);
-  pointer-events: none;
-  z-index: 3;
-}
-
-.planListArea .listHeader {
-  position: relative;
-  z-index: 4;
-}
-
-.planList {
-  position: relative;
-  z-index: 1;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-
-.planList::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-.planCard {
-  background-image: linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(247, 239, 221, 0.98));
-}
-
-.planCard::before {
-  display: none;
-}
-
-.planCard::after {
-  right: 50%;
-  top: -10px;
-  width: 84px;
-  height: 20px;
-  transform: translateX(50%) rotate(-2deg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--card-accent, var(--accent)) 72%, white), color-mix(in srgb, var(--card-accent, var(--accent)) 56%, #d2b16c));
-  border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 26%, rgba(170, 131, 53, 0.16));
-  box-shadow: 0 6px 10px rgba(162, 125, 48, 0.08);
-}
-
-@media (min-width: 780px) {
-  .planComposer,
-  .planListArea {
-    height: 620px;
-    min-height: 620px;
-  }
-
-  .planList {
-    padding-right: 2px;
-    padding-bottom: 46px;
-  }
-}
-
-/* Simplified Card Layout - Reverting to a cleaner aesthetic */
 
 .simplePlanCard {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  align-self: start;
+  background: linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(247, 239, 221, 0.98));
+  border: 1px solid rgba(128, 104, 72, 0.12);
+  border-radius: 12px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 10px 18px rgba(70, 56, 40, 0.06);
 }
 
-.simplePlanCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+.cardTape {
+  position: absolute;
+  top: -8px;
+  right: 50%;
+  width: 84px;
+  height: 18px;
+  transform: translateX(50%) rotate(-2deg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--card-accent) 72%, white), color-mix(in srgb, var(--card-accent) 56%, #d2b16c));
+  border-radius: 3px;
 }
 
 .planCardHeader {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.priorityIndicator {
-  width: 4px;
-  height: 32px;
-  border-radius: 2px;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
+.planMainInfo { min-width: 0; }
 
-.planMainInfo {
-  flex: 1;
+.priorityChip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(120, 101, 71, 0.08);
+  color: #8e6a2f;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
 }
 
 .planMainInfo h4 {
-  margin: 0;
-  font-size: 1rem;
-  color: #1a1a1a;
+  margin: 10px 0 6px;
+  font-size: 1.08rem;
   line-height: 1.2;
-}
-
-.planDates {
-  display: block;
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.cardActions {
-  display: flex;
-  gap: 8px;
-}
-
-.helpIconButton,
-.deleteIconButton {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: #999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.helpIconButton:hover {
-  background: #f0f0f0;
-  color: #666;
-}
-
-.deleteIconButton:hover {
-  background: #fee2e2;
-  color: #ef4444;
+  color: #2d3340;
 }
 
 .planNotes {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin: 0;
-  line-height: 1.4;
-  padding-left: 16px;
+  font-size: 0.95rem;
+}
+
+.cardIconButton {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(120, 101, 71, 0.08);
+  color: #7a5b37;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .planCardFooter {
-  margin-top: 4px;
+  margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid #f3f4f6;
-}
-
-.completeToggle {
-  background: none;
-  border: none;
+  border-top: 1px dashed rgba(122, 100, 71, 0.16);
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.planDates {
+  color: #6e7786;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #4b5563;
-  transition: background 0.2s, color 0.2s;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.completeToggle:hover {
-  background: #f3f4f6;
+.completeButton {
+  border: 0;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #735a40;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.checkIcon {
-  color: #10b981;
-  font-size: 1.1rem;
-}
-
-.circleIcon {
-  color: #d1d5db;
-  font-size: 1.1rem;
+.completeButton svg,
+.cardIconButton svg,
+.navButton svg,
+.scrollHint svg {
+  width: 18px;
+  height: 18px;
 }
 
 .planDone {
-  background: #f9fafb;
+  opacity: 0.72;
 }
 
-.planDone .planMainInfo h4 {
-  text-decoration: line-through;
-  color: #9ca3af;
+.scrollHint {
+  display: none;
 }
 
-.planDone .planNotes {
-  color: #9ca3af;
-}
-
-.planDone .completeToggle {
-  color: #059669;
-}
-
-/* Priority Colors */
-.priorityHigh { background-color: #ef4444; }
-.priorityMedium { background-color: #f59e0b; }
-.priorityLow { background-color: #3b82f6; }
-
-/* Fixed Desktop Container */
-@media (min-width: 1024px) {
-  .scene, 
-  .plannerSection {
-    width: 980px !important;
-    max-width: 980px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+@media (min-width: 780px) {
+  .page { padding: 38px 28px 96px; }
+  .stand { height: 228px; }
+  .binding { gap: 24px; }
+  .imagePanel { min-height: 420px; }
+  .overlayYear { top: 24px; left: 24px; }
+  .overlayMonth { left: 24px; bottom: 28px; }
+  .calendarPanel { padding: 34px 28px 34px; }
+  .cutTriangle { width: 116px; height: 42px; }
+  .navButton { width: 50px; height: 50px; }
+  .navLeft { left: -48px; }
+  .navRight { right: -48px; }
+  .dayCell { min-height: 42px; }
+  .plannerShell { padding: 30px; }
+  .plannerGrid {
+    grid-template-columns: 0.92fr 1.08fr;
+    align-items: start;
+  }
+  .planComposer,
+  .planListArea {
+    height: 620px;
+    min-height: 620px;
+  }
+  .planComposer {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+  .planForm {
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
+    padding-right: 6px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .planForm::-webkit-scrollbar { width: 0; height: 0; }
+  .planListArea {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  .planList {
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .planList::-webkit-scrollbar { width: 0; height: 0; }
+  .scrollHint {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-left: auto;
+    border-radius: 999px;
+    background: rgba(255, 248, 236, 0.96);
+    color: #7a6141;
+    box-shadow: 0 10px 20px rgba(73, 58, 40, 0.08);
   }
 }
+
+@media (min-width: 1080px) {
+  .imagePanel { min-height: 470px; }
+  .calendarPanel { padding: 38px 32px 38px; }
+  .navLeft { left: -56px; }
+  .navRight { right: -56px; }
+  .dayCell { min-height: 46px; }
+  .plannerShell { padding: 36px; }
+}
+
